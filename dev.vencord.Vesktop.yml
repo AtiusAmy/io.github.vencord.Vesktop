@@ -1,12 +1,12 @@
-app-id: dev.vencord.vesktop
+app-id: dev.vencord.Vesktop
 base: org.electronjs.Electron2.BaseApp
 base-version: "23.08"
 runtime: org.freedesktop.Platform
 runtime-version: "23.08"
 sdk: org.freedesktop.Sdk
 separate-locales: false
-command: dev.vencord.vesktop
-rename-desktop-file: vesktop.desktop
+command: dev.vencord.Vesktop
+rename-desktop-file: dev.vencord.Vesktop
 finish-args:
   - --share=ipc
   - --socket=x11
@@ -27,33 +27,32 @@ finish-args:
   - --talk-name=org.ayatana.indicator.application
   - --talk-name=org.freedesktop.portal.Background
 modules:
-  - name: Vesktop
+  - name: vencorddesktop
     buildsystem: simple
     build-commands:
-      - chmod +x Vesktop-*.AppImage
-      - ./Vesktop-*.AppImage --appimage-extract
-
-      - install -dm755 "${FLATPAK_DEST}/bin" "${FLATPAK_DEST}/lib/vesktop"
-      - cp -r squashfs-root/* "${FLATPAK_DEST}/lib/vesktop"
-      - cp -r squashfs-root/usr/lib/* "${FLATPAK_DEST}/lib"
-
-      - install -Dm644 "dev.vencord.vesktop.png" "${FLATPAK_DEST}/share/icons/hicolor/512x512/apps/dev.vencord.vesktop.png"
-      - install -Dm755 "run.sh" "${FLATPAK_DEST}/bin/dev.vencord.vesktop"
-      - desktop-file-install --dir="${FLATPAK_DEST}/share/applications" --remove-key=X-AppImage-Version --set-key=Exec --set-value=dev.vencord.vesktop --set-key=Icon --set-value=dev.vencord.vesktop vesktop.desktop
-
-      - install -Dm644 -t ${FLATPAK_DEST}/share/metainfo dev.vencord.vesktop.metainfo.xml
+      - chmod +x Vesktop.AppImage
+      - ./Vesktop.AppImage --appimage-extract
+      - desktop-file-edit --set-icon ${FLATPAK_ID} --set-key Exec --set-value 'run.sh
+        %u' squashfs-root/vencorddesktop.desktop --remove-key=X-AppImage-Version --remove-key=WMClass
+      - install -D squashfs-root/vencorddesktop.desktop /app/share/applications/dev.vencord.Vencord.desktop
+      - install -D run.sh /app/bin/
+      - install -D dev.vencord.Vesktop.metainfo.xml /app/share/metainfo/dev.vencord.Vesktop.metainfo.xml
+      - mkdir -p /app/share/icons/hicolor
+      - cp -r squashfs-root/usr/share/icons/hicolor/* ${FLATPAK_DEST}/share/icons/hicolor
+      # XDG desktop specification doesn't support icons larger than 512x512
+      - rm -rf ${FLATPAK_DEST}/share/icons/hicolor/1024x1024
+      - mv squashfs-root /app/bin/vencorddesktop
+      - rm Vesktop.AppImage
     sources:
       - type: file
         url: https://github.com/Vencord/Vesktop/releases/download/v0.3.3/Vesktop-0.3.3.AppImage
         sha512: c28beda1268b784723df76f0a6e82032801e1c8c6179dc68baccfce177ee26bc1c55b7262cd7652fe24c30419dbbe70d8058541bda1d8b2f6893ce6ac6115cf4
+        dest_filename: Vesktop.AppImage
         x-checker-data:
           type: electron-updater
           url: https://github.com/Vencord/Vesktop/releases/latest/download/latest-linux.yml
       - type: file
-        path: dev.vencord.vesktop.metainfo.xml
-      - type: file
-        path: dev.vencord.vesktop.png
-      - type: file
-        path: vesktop.desktop
+        path: dev.vencord.Vesktop.metainfo.xml
       - type: file
         path: run.sh
+
